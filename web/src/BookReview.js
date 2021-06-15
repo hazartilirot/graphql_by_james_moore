@@ -25,6 +25,14 @@ query Book($id: ID!) {
 }
 `
 
+const createReviewMutation = `
+mutation CreateReview($reviewInput: ReviewInput!) {
+  createReview(reviewInput: $reviewInput) {
+    id
+  }
+}
+`
+
 const findBookById = (id, books) => R.find(R.propEq('id', id), books);
 
 const isInputValid = reviewInput => {
@@ -53,7 +61,7 @@ class BookReview extends Component {
       const variables = {id}
       const result = await fetch({query, variables})
       const book = R.path(['data', 'book'], result);
-      const errorList = R.pathOr([], ['error'], result);
+      const errorList = R.pathOr([], ['errors'], result);
       const errors = R.map(error => error.message, errorList)
       
       this.setState({ book, errors });
@@ -73,10 +81,24 @@ class BookReview extends Component {
     const { book, reviewInput } = this.state;
     // eslint-disable-next-line
     const { name, count, email, title, comment } = reviewInput;
-    // TODO: add actual mutation to add new review
+    
+    const variables = {
+      reviewInput: {
+        bookId: book.id,
+        comment,
+        email,
+        name,
+        title,
+        rating: count
+      }
+    }
     try {
-      const errors = [];
-      this.setState({ redirect: true, errors });
+      const result = await fetch({query: createReviewMutation, variables})
+      const id = R.path(['data', 'createReview', 'id'], result);
+      const errorList = R.pathOr([], ['errors'], result);
+      const errors = R.map(error => error.message, errorList)
+      const redirect = !!id;
+      this.setState({ redirect, errors });
     } catch (err) {}
   };
   render() {

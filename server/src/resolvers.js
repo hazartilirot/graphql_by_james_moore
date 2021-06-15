@@ -1,14 +1,25 @@
-import {allBooks, findBookById, imageUrl} from './book';
-import {authorsByBookId} from './author'
+import {
+  allBooks, 
+  imageUrl, 
+  searchBook,
+  createBook
+} from './book';
 import {allReviews, createReview} from './review'
 import gravatar from "gravatar";
+import search from './search'
 
 const resolvers = {
+  SearchBookResult: {
+    imageUrl: (result, args) => imageUrl(args.size, result.id)
+  },
+  SearchResult: {
+    __resolveType: obj => (obj.__type)
+  },
   User: {
     imageUrl: (user, args) => gravatar.url(user.email, {s: args.size})
   },
   Book: {
-    imageUrl: (book, object) => imageUrl(object.size, book.googleId),
+    imageUrl: (book, args) => imageUrl(args.size, book.googleId),
     authors: (book, args, context) => {
       const {loaders: {findAuthorsByBookIdsLoader}} = context;
       return findAuthorsByBookIdsLoader.load(book.id);
@@ -35,13 +46,13 @@ const resolvers = {
     book: (root, args, context) => {
       const {loaders: {findBooksByIdsLoader}} = context;
       return findBooksByIdsLoader.load(args.id);
-    }
+    },
+    searchBook: (root, {query}) => searchBook(query),
+    search: (root, {query}) => search(query)
   },
   Mutation: {
-    createReview: (root, args) => {
-      const {reviewInput} = args;
-      return createReview(reviewInput)
-    }
+    createReview: (root, {reviewInput}) => createReview(reviewInput),
+    createBook: (root, {googleBookId}) => createBook(googleBookId)
   }
 };
 export default resolvers;

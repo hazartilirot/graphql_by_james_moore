@@ -20,7 +20,7 @@ Change values in METHOD column to trust provided you're under development mode
 Run psql and reload your config. Alternatively if you're a Windows user go 
 to a control panel, open services and restart a postgresql service itself
 
-`select pg_reload_conf(); - reload config`
+`select pg_reload_conf();`
 
 Use "postgres" username to enter to a postgresql CLI once you run psql and 
 then your password would be the password you specified during PostgreSQL installation.

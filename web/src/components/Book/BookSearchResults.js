@@ -34,7 +34,9 @@ const BookSearchResults = props => {
     <ul className="list pl0">
       {R.map(
         result => (
-          <BookSearchResult addBook={addBook} key={result.id} {...result} />
+          <BookSearchResult 
+            addBook={addBook} key={result.id} {...result} 
+          />
         ),
         results,
       )}
